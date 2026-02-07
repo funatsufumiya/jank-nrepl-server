@@ -1,0 +1,4 @@
+(ns jank-nrepl-server.main)
+
+(defn -main [& args]
+  (println "Hello, world!"))
