@@ -1,2 +1,5 @@
 .clj-kondo/
 target/
+cpp/*.dll
+cpp/*.o
+cpp/*.a
