@@ -1,4 +1,6 @@
 (ns jank-nrepl-server.main)
 
+(cpp/raw "#include <simple_socket.hpp>")
+
 (defn -main [& args]
   (println "Hello, world!"))

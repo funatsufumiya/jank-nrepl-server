@@ -54,6 +54,7 @@
 #endif //CURRENT_CXX_VERSION < 201103L
 
 #ifdef _WIN32
+    #include <windows.h>
     #include <winsock2.h>
     #include <ws2tcpip.h>
 #else
