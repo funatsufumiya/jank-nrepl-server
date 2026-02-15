@@ -6,6 +6,9 @@
 (cpp/raw "template <typename T> bool is_null_shared_ptr(std::shared_ptr<T>& ptr){ return !ptr; }")
 (cpp/raw "template <typename T> bool is_null_ptr(T* ptr){ return ptr == nullptr; }")
 
+(defn make-repl [session]
+  (fn [e] (eval e)))
+
 (defn start-server [host port]
   (let [server (cpp/simplesocket.create_and_start_tcp_server host port)]
     (if (cpp/is_null_shared_ptr server)
@@ -17,6 +20,11 @@
   (loop []
     (when (not (cpp/.wait_client (cpp/unbox cpp/simplesocket.TcpServer* server) (cpp/unbox cpp/simplesocket.TcpNetClient* client)))
       (recur))))
+
+;; (defn -main [& args]
+;;   (let [repl (make-repl nil)]
+;;     (repl '(def a "hoge"))
+;;     (repl '(println a))))
 
 (defn -main [& args]
   (let [server (cpp/unbox cpp/simplesocket.TcpServer* (start-server "localhost" 1234))]
