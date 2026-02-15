@@ -112,7 +112,7 @@ int run_server() {
     // const std::string DEFAULT_PORT = "1234";
     // const int DEFAULT_PROTOCOL_FAMILY = 0;
     // const long DEFAULT_BACKLOG = 0x7fffffff;
-    const int DEFAULT_RECV_MSG_LEN = 255;
+    // const int DEFAULT_RECV_MSG_LEN = 255;
 
     // kss::TcpServerSocketInfo info;
     // info.m_node                 = DEFAULT_IP;
@@ -152,7 +152,7 @@ int run_server() {
 
     std::cout << "sent message to client: " << msg.sentLen() << "byte" << std::endl;
 
-    RecvMsg response(DEFAULT_RECV_MSG_LEN);
+    RecvMsg response(255);
 
     if (!server.recv_msg(client, response)) {
         std::cerr << "can't received message from client!" << std::endl;
