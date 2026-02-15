@@ -1,5 +1,7 @@
 (ns jank-nrepl-server.main)
 
+; NOTE: Please test this server with the client of https://github.com/funatsufumiya/simplesocket-test
+
 (cpp/raw "#include <simple_socket_wrapper.hpp>")
 (cpp/raw "template <typename T> bool is_null_shared_ptr(std::shared_ptr<T>& ptr){ return !ptr; }")
 (cpp/raw "template <typename T> bool is_null_ptr(T* ptr){ return ptr == nullptr; }")
