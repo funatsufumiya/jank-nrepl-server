@@ -23,6 +23,10 @@ public:
         return msg.m_msg;
     }
 
+    std::string get_msg_str(){
+        return std::string(msg.m_msg);
+    }
+
     void* get_msg_impl(){
         return &msg;
     }
@@ -45,6 +49,10 @@ public:
         return msg.m_msg;
     }
 
+    std::string get_msg_str(){
+        return std::string(msg.m_msg);
+    }
+
     void* get_msg_impl(){
         return &msg;
     }
@@ -59,12 +67,20 @@ class TcpNetClientImpl : public TcpNetClient {
 public:
     kani::simple_socket::TcpNetClient client;
 
-    std::string_view get_host(){
-        return client.get_host();
+    // std::string_view get_host(){
+    //     return client.get_host();
+    // }
+
+    // std::string_view get_service(){
+    //     return client.get_service();
+    // }
+
+    std::string get_host(){
+        return std::string(client.get_host());
     }
 
-    std::string_view get_service(){
-        return client.get_service();
+    std::string get_service(){
+        return std::string(client.get_service());
     }
 
     void close(){
@@ -94,15 +110,15 @@ public:
         return server.start() == kss::SS_START_RESULT_SUCCESS;
     }
 
-    bool wait_client(TcpNetClient& client){
+    bool wait_client(std::shared_ptr<TcpNetClient>& client){
         return server.wait_client(ptr_from(client));
     }
 
-    bool send_msg(TcpNetClient& client, SendMsg& msg){
+    bool send_msg(std::shared_ptr<TcpNetClient>& client, std::shared_ptr<SendMsg>& msg){
         return server.send_msg(ptr_from(client), msg_from(msg));
     }
 
-    bool recv_msg(TcpNetClient& client, RecvMsg& msg){
+    bool recv_msg(std::shared_ptr<TcpNetClient>& client, std::shared_ptr<RecvMsg>& msg){
         return server.recv_msg(ptr_from(client), msg_from(msg));
     }
 
@@ -111,16 +127,16 @@ public:
     }
 
 private:
-    kani::simple_socket::TcpNetClient* ptr_from(TcpNetClient& client){
-        return (kani::simple_socket::TcpNetClient*)(client.get_client_impl());
+    kani::simple_socket::TcpNetClient* ptr_from(std::shared_ptr<TcpNetClient>& client){
+        return (kani::simple_socket::TcpNetClient*)(client->get_client_impl());
     }
 
-    kani::simple_socket::SendMsg* msg_from(SendMsg& client){
-        return (kani::simple_socket::SendMsg*)(client.get_msg_impl());
+    kani::simple_socket::SendMsg* msg_from(std::shared_ptr<SendMsg>& client){
+        return (kani::simple_socket::SendMsg*)(client->get_msg_impl());
     }
 
-    kani::simple_socket::RecvMsg* msg_from(RecvMsg& client){
-        return (kani::simple_socket::RecvMsg*)(client.get_msg_impl());
+    kani::simple_socket::RecvMsg* msg_from(std::shared_ptr<RecvMsg>& client){
+        return (kani::simple_socket::RecvMsg*)(client->get_msg_impl());
     }
 };
 
@@ -143,7 +159,7 @@ std::shared_ptr<SendMsg> create_send_msg(){
     return std::make_shared<SendMsgImpl>();
 }
 
-std::shared_ptr<SendMsg> create_send_msg(std::string s){
+std::shared_ptr<SendMsg> create_send_msg(const std::string& s){
     return std::make_shared<SendMsgImpl>(s);
 }
 
@@ -190,13 +206,13 @@ int run_server() {
     auto client = create_tcp_net_client();
     std::cout << "waiting for client..." << std::endl;
 
-    while (!server->wait_client(*client)) { }
+    while (!server->wait_client(client)) { }
 
     std::cout << "client ( " << client->get_host() << " : " << client->get_service() << " ) connected!" << std::endl;
 
     auto msg = create_send_msg("Hello, client! I'm a server. Welcome to my simple server 8)");
 
-    if (!server->send_msg(*client, *msg)) {
+    if (!server->send_msg(client, msg)) {
         std::cerr << "can't sent message to client!" << std::endl;
         return 1;
     }
@@ -205,7 +221,7 @@ int run_server() {
 
     auto response = create_recv_msg(255);
 
-    if (!server->recv_msg(*client, *response)) {
+    if (!server->recv_msg(client, response)) {
         std::cerr << "can't received message from client!" << std::endl;
         return 1;
     }
