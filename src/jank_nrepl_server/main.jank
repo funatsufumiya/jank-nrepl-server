@@ -1,42 +1,49 @@
 (ns jank-nrepl-server.main)
 
 (cpp/raw "#include <simple_socket_wrapper.hpp>")
+(cpp/raw "template <typename T> bool is_null_shared_ptr(std::shared_ptr<T>& ptr){ return !ptr; }")
+(cpp/raw "template <typename T> bool is_null_ptr(T* ptr){ return ptr == nullptr; }")
 
-;; (defn to_str [s]
-;;   (cpp/cast cpp/std.string s))
+(defn start-server [host port]
+  (let [server (cpp/simplesocket.create_and_start_tcp_server host port)]
+    (if (cpp/is_null_shared_ptr server)
+      (println "Failed to create server!")
+          nil)
+    (cpp/box (cpp/.get server))))
+
+(defn wait-client [server client]
+  (loop []
+    (when (not (cpp/.wait_client (cpp/unbox cpp/simplesocket.TcpServer* server) (cpp/unbox cpp/simplesocket.TcpNetClient* client)))
+      (recur))))
 
 (defn -main [& args]
-  (let [server (cpp/.get (cpp/simplesocket.create_tcp_server "localhost" 1234))]
-    (if (not (cpp/.is_valid server))
-      (do (println "can't initialized server!")
-          1)
-      (if (not (cpp/.start server))
-        (do (println "can't start the server!")
-            1)
-        (let [client (cpp/.get (cpp/simplesocket.create_tcp_net_client))]
-          (println "waiting for client...")
-          (loop []
-            (when (not (cpp/.wait_client server client))
-              (recur)))
-          (println (str "client ( " (cpp/.get_host client)
-                        " : " (cpp/.get_service client)
-                        " ) connected!"))
-          (let [msg (cpp/.get (cpp/simplesocket.create_send_msg "Hello, client! I'm a server. Welcome to my simple server 8)"))]
-            (if (not (cpp/.send_msg server client msg))
-              (do (println "can't sent message to client!")
-                  1)
-              (do
-                (println (str "sent message to client: " (cpp/.sentLen msg) "byte"))
-                (let [response (cpp/.get (cpp/simplesocket.create_recv_msg 255))]
-                  (if (not (cpp/.recv_msg server client response))
-                    (do (println "can't received message from client!")
-                        1)
-                    (do
-                      (println (str "received message from client: " (cpp/.recvLen response) "byte"))
-                      (println (str "Client: " (cpp/.get_msg_str response)))
-                      (println "Perfect! Now, say to goodbye :')")
-                      (cpp/.close client)
-                      (println "stopping the server...")
-                      (cpp/.stop server)
-                      (println "server stopped")
-                      0)))))))))))
+  (let [server (cpp/unbox cpp/simplesocket.TcpServer* (start-server "localhost" 1234))]
+    (if (cpp/is_null_ptr server) 1
+       (let [client (cpp/.get (cpp/simplesocket.create_tcp_net_client))]
+         (println "waiting for client...")
+
+         (wait-client (cpp/box server) (cpp/box client))
+          
+         (println (str "client ( " (cpp/.get_host client)
+                       " : " (cpp/.get_service client)
+                       " ) connected!"))
+          
+         (let [msg (cpp/.get (cpp/simplesocket.create_send_msg "Hello, client! I'm a server. Welcome to my simple server 8)"))]
+           (if (not (cpp/.send_msg server client msg))
+             (do (println "can't sent message to client!")
+                 1)
+             (do
+               (println (str "sent message to client: " (cpp/.sentLen msg) "byte"))
+               (let [response (cpp/.get (cpp/simplesocket.create_recv_msg 255))]
+                 (if (not (cpp/.recv_msg server client response))
+                   (do (println "can't received message from client!")
+                       1)
+                   (do
+                     (println (str "received message from client: " (cpp/.recvLen response) "byte"))
+                     (println (str "Client: " (cpp/.get_msg_str response)))
+                     (println "Perfect! Now, say to goodbye :')")
+                     (cpp/.close client)
+                     (println "stopping the server...")
+                     (cpp/.stop server)
+                     (println "server stopped")
+                     0))))))))))

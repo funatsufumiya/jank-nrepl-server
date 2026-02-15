@@ -155,6 +155,19 @@ std::shared_ptr<TcpServer> create_tcp_server(std::string host, int port){
     return std::make_shared<TcpServerImpl>(info);
 }
 
+std::shared_ptr<TcpServer> create_and_start_tcp_server(std::string host, int port){
+    auto server = create_tcp_server(host, port);
+    if(server->is_valid()){
+        if(server->start()){
+            return server;
+        }else{
+            return nullptr;
+        }
+    }else{
+        return nullptr;
+    }
+}
+
 std::shared_ptr<SendMsg> create_send_msg(){
     return std::make_shared<SendMsgImpl>();
 }

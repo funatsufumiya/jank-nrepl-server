@@ -53,6 +53,7 @@ public:
 };
 
 std::shared_ptr<TcpServer> create_tcp_server(std::string host, int port);
+std::shared_ptr<TcpServer> create_and_start_tcp_server(std::string host, int port);
 std::shared_ptr<SendMsg> create_send_msg();
 std::shared_ptr<SendMsg> create_send_msg(std::string s);
 std::shared_ptr<RecvMsg> create_recv_msg(int len);
