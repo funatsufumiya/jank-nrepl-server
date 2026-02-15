@@ -1,6 +1,7 @@
 (ns jank-nrepl-server.main)
 
-(cpp/raw "#include <simple_socket.hpp>")
+(cpp/raw "#include <simple_socket_wrapper.hpp>")
 
 (defn -main [& args]
-  (println "Hello, world!"))
+  (cpp/raw "simplesocket::run_server();"))
+  ;; (println "Hello, world!"))

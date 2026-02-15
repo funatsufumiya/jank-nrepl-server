@@ -6,7 +6,7 @@
   :middleware [leiningen.jank/middleware]
   :jank {:include-dirs ["cpp"]
          :library-dirs ["cpp"]
-         :linked-libraries []}
+         :linked-libraries ["simplesocket"]}
   :main jank-nrepl-server.main
   :profiles {:debug {:jank {:optimization-level 0}}
              :release {:jank {:optimization-level 2}}})
