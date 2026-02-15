@@ -14,7 +14,7 @@ $ lein run
 
 ```
 
-## Dependency
+## Dependencies
 
 - SimpleSocket (included)
-    MIT License: https://github.com/kaniteru/SimpleSocket
+    - MIT License: https://github.com/kaniteru/SimpleSocket
