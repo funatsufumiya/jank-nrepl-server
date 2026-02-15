@@ -3,5 +3,5 @@
 (cpp/raw "#include <simple_socket_wrapper.hpp>")
 
 (defn -main [& args]
-  (cpp/raw "simplesocket::run_server();"))
+  (cpp/simplesocket.run_server))
   ;; (println "Hello, world!"))
