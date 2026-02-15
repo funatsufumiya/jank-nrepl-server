@@ -4,4 +4,6 @@
 target/
 cpp/*.dll
 cpp/*.o
+cpp/*.so
+cpp/*.dylib
 cpp/*.a
