@@ -8,12 +8,32 @@ namespace simplesocket {
 
 namespace kss = kani::simple_socket;
 
+class RecvMsg {
+public:
+    kss::RecvMsg msg;
+
+    RecvMsg(int length): msg(kss::RecvMsg(length)) {
+    }
+
+    int recvLen(){
+        return msg.m_recvLen;
+    }
+
+    std::string_view get_msg(){
+        return msg.m_msg;
+    }
+};
+
 class SendMsg {
 public:
     kss::SendMsg msg;
 
     int sentLen(){
         return msg.m_sentLen;
+    }
+
+    std::string_view get_msg(){
+        return msg.m_msg;
     }
 };
 
@@ -57,6 +77,10 @@ public:
 
     bool send_msg(TcpNetClient& client, SendMsg& msg){
         return server.send_msg(&client.client, &msg.msg);
+    }
+
+    bool recv_msg(TcpNetClient& client, RecvMsg& msg){
+        return server.recv_msg(&client.client, &msg.msg);
     }
 
     void stop(){
@@ -128,15 +152,15 @@ int run_server() {
 
     std::cout << "sent message to client: " << msg.sentLen() << "byte" << std::endl;
 
-    kss::RecvMsg response(DEFAULT_RECV_MSG_LEN);
+    RecvMsg response(DEFAULT_RECV_MSG_LEN);
 
-    if (!server.server.recv_msg(&client.client, &response)) {
+    if (!server.recv_msg(client, response)) {
         std::cerr << "can't received message from client!" << std::endl;
         return 1;
     }
 
-    std::cout << "received message from client: " << response.m_recvLen << "byte" << std::endl;
-    std::cout << "Client: " << response.m_msg << std::endl;
+    std::cout << "received message from client: " << response.recvLen() << "byte" << std::endl;
+    std::cout << "Client: " << response.get_msg() << std::endl;
 
     std::cout << "Perfect! Now, say to goodbye :')" << std::endl;
     client.close();
