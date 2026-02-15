@@ -75,8 +75,8 @@ TcpServer create_tcp_server(std::string host, int port){
     info.m_protocolFamily = 0;
     info.m_backlog = 0x7fffffff;
 
-    kss::TcpServer server(info);
-    return TcpServer{ server };
+    // kss::TcpServer server(info);
+    return TcpServer{ kss::TcpServer(info) };
 }
 
 int run_server() {
@@ -88,7 +88,7 @@ int run_server() {
     // const std::string DEFAULT_PORT = "1234";
     // const int DEFAULT_PROTOCOL_FAMILY = 0;
     // const long DEFAULT_BACKLOG = 0x7fffffff;
-    // const int DEFAULT_RECV_MSG_LEN = 255;
+    const int DEFAULT_RECV_MSG_LEN = 255;
 
     // kss::TcpServerSocketInfo info;
     // info.m_node                 = DEFAULT_IP;
