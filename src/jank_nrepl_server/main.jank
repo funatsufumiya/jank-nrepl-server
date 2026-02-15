@@ -6,37 +6,37 @@
 ;;   (cpp/cast cpp/std.string s))
 
 (defn -main [& args]
-  (let [server (cpp/simplesocket.create_tcp_server "localhost" 1234)]
-    (if (not (cpp/.is_valid (cpp/.get server)))
+  (let [server (cpp/.get (cpp/simplesocket.create_tcp_server "localhost" 1234))]
+    (if (not (cpp/.is_valid server))
       (do (println "can't initialized server!")
           1)
-      (if (not (cpp/.start (cpp/.get server)))
+      (if (not (cpp/.start server))
         (do (println "can't start the server!")
             1)
-        (let [client (cpp/simplesocket.create_tcp_net_client)]
+        (let [client (cpp/.get (cpp/simplesocket.create_tcp_net_client))]
           (println "waiting for client...")
           (loop []
-            (when (not (cpp/.wait_client (cpp/.get server) client))
+            (when (not (cpp/.wait_client server client))
               (recur)))
-          (println (str "client ( " (cpp/.get_host (cpp/.get client))
-                        " : " (cpp/.get_service (cpp/.get client))
+          (println (str "client ( " (cpp/.get_host client)
+                        " : " (cpp/.get_service client)
                         " ) connected!"))
-          (let [msg (cpp/simplesocket.create_send_msg (cpp/cast cpp/std.string "Hello, client! I'm a server. Welcome to my simple server 8)"))]
-            (if (not (cpp/.send_msg (cpp/.get server) client msg))
+          (let [msg (cpp/.get (cpp/simplesocket.create_send_msg "Hello, client! I'm a server. Welcome to my simple server 8)"))]
+            (if (not (cpp/.send_msg server client msg))
               (do (println "can't sent message to client!")
                   1)
               (do
-                (println (str "sent message to client: " (cpp/.sentLen (cpp/.get msg)) "byte"))
-                (let [response (cpp/simplesocket.create_recv_msg (cpp/cast cpp/int 255))]
-                  (if (not (cpp/.recv_msg (cpp/.get server) client response))
+                (println (str "sent message to client: " (cpp/.sentLen msg) "byte"))
+                (let [response (cpp/.get (cpp/simplesocket.create_recv_msg 255))]
+                  (if (not (cpp/.recv_msg server client response))
                     (do (println "can't received message from client!")
                         1)
                     (do
-                      (println (str "received message from client: " (cpp/.recvLen (cpp/.get response)) "byte"))
-                      (println (str "Client: " (cpp/.get_msg_str (cpp/.get response))))
+                      (println (str "received message from client: " (cpp/.recvLen response) "byte"))
+                      (println (str "Client: " (cpp/.get_msg_str response)))
                       (println "Perfect! Now, say to goodbye :')")
-                      (cpp/.close (cpp/.get client))
+                      (cpp/.close client)
                       (println "stopping the server...")
-                      (cpp/.stop (cpp/.get server))
+                      (cpp/.stop server)
                       (println "server stopped")
                       0)))))))))))
