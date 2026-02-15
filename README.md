@@ -13,3 +13,8 @@ $ ./build-cpp.sh
 $ lein run
 
 ```
+
+## Dependency
+
+- SimpleSocket (included)
+    MIT License: https://github.com/kaniteru/SimpleSocket
